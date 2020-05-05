@@ -1,0 +1,6 @@
+*.idea
+*.ipynb
+config.py
+gemini_config.py
+**/test_env
+*__pycache__*
