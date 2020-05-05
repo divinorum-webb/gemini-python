@@ -11,4 +11,5 @@ gemini_config = {
 
 
 conn = GeminiConnection(config=gemini_config)
+
 response = conn.get_symbols()
