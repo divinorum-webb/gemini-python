@@ -2,7 +2,7 @@ import requests
 
 from .headers import BaseHeaders
 from .payloads import BasePayload
-from .endpoints import SymbolsEndpoint, TickerEndpoint, CandlesEndpoint
+from .endpoints import SymbolsEndpoint, TickerEndpoint, CandlesEndpoint, CurrentOrderBookEndpoint
 
 
 class GeminiConnection:
@@ -38,7 +38,7 @@ class GeminiConnection:
         response = requests.get(self.active_endpoint)
         return response
 
-    def get_candles(self, symbol, time_frame, version='v2', sandbox=False):
+    def get_candles(self, symbol, time_frame, version='v2', sandbox=False) -> requests.models.Response:
         """
         Get time-intervaled data for the specified symbol.
         :param str symbol: the crypto symbol being queried
@@ -54,8 +54,28 @@ class GeminiConnection:
         response = requests.get(self.active_endpoint)
         return response
 
-    def get_current_order_book(self):
-        pass
+    def get_current_order_book(self,
+                               symbol,
+                               version='v1',
+                               sandbox=False,
+                               limit_bids=None,
+                               limit_asks=None) -> requests.models.Response:
+        """
+        Get the current order book as two arrays (bids / asks).
+        :param str symbol: the crypto symbol being queried
+        :param str version: the api version to use
+        :param bool sandbox: True if using the sandbox api, False by default
+        :param int limit_bids: (optional) limits the number of bid price (offers to buy) levels returned
+        :param int limit_asks: (optional) limits the number of ask price (offers to sell) levels returned
+        :return: HTTP response
+        """
+        self.active_endpoint = CurrentOrderBookEndpoint(symbol,
+                                                        version=version,
+                                                        sandbox=sandbox,
+                                                        limit_bids=limit_bids,
+                                                        limit_asks=limit_asks).get_endpoint()
+        response = requests.get(self.active_endpoint)
+        return response
 
     def get_trade_history(self):
         pass
