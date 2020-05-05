@@ -1,0 +1,1 @@
+from .verification import verify_api_method_exists
