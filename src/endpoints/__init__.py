@@ -7,3 +7,4 @@ from .trade_history_endpoint import TradeHistoryEndpoint
 from .current_auction_endpoint import CurrentAuctionEndpoint
 from .auction_history_endpoint import AuctionHistoryEndpoint
 from .price_feed_endpoint import PriceFeedEndpoint
+from .new_order_endpoint import NewOrderEndpoint

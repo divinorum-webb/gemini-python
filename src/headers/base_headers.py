@@ -7,14 +7,14 @@ import json
 class BaseHeaders:
     def __init__(self,
                  api_key,
+                 api_secret,
                  payload,
-                 signature,
                  content_length='0',
                  content_type='text/plain',
                  cache_control='no-cache'):
         self._api_key = api_key
+        self._api_secret = api_secret.encode()
         self._payload = payload
-        self._signature = signature
         self._content_length = content_length
         self._content_type = content_type
         self._cache_control = cache_control
@@ -26,7 +26,7 @@ class BaseHeaders:
 
     @property
     def signature(self):
-        return hmac.new(self._api_key, self.b64, hashlib.sha384).hexdigest()
+        return hmac.new(self._api_secret, self.b64, hashlib.sha384).hexdigest()
 
     @property
     def headers(self):
@@ -34,10 +34,12 @@ class BaseHeaders:
             "Content-Length": self._content_length,
             "Content-Type": self._content_type,
             "X-GEMINI-APIKEY": self._api_key,
-            "X-GEMINI-PAYLOAD": self._payload,
+            "X-GEMINI-PAYLOAD": self.b64,
             "X-GEMINI-SIGNATURE": self.signature,
             "Cache-Control": self._cache_control
         }
 
     def get_headers(self):
+        print("signature: ", self.signature)
+        print("headers: ", self.headers)
         return self.headers

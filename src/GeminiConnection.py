@@ -1,9 +1,9 @@
 import requests
 
 from .headers import BaseHeaders
-from .payloads import BasePayload
+from .payloads import NewOrderPayload
 from .endpoints import SymbolsEndpoint, TickerEndpoint, CandlesEndpoint, CurrentOrderBookEndpoint, \
-    TradeHistoryEndpoint, CurrentAuctionEndpoint, AuctionHistoryEndpoint, PriceFeedEndpoint
+    TradeHistoryEndpoint, CurrentAuctionEndpoint, AuctionHistoryEndpoint, PriceFeedEndpoint, NewOrderEndpoint
 
 
 class GeminiConnection:
@@ -155,8 +155,52 @@ class GeminiConnection:
 
     # define order placement api methods
 
-    def new_order(self):
-        pass
+    def new_order(self,
+                  symbol,
+                  amount,
+                  price,
+                  side,
+                  version='v1',
+                  sandbox='False',
+                  client_order_id=None,
+                  order_type='exchange limit',
+                  options=None,
+                  min_amount=None,
+                  stop_price=None,
+                  account=None) -> requests.models.Response:
+        """
+        Places new orders on Gemini Exchange.
+        :param str symbol: the currency symbol for the new order
+        :param str amount: the quoted decimal amount to purchase
+        :param str price: the quoted decimal amount to spend per unit
+        :param str side: 'buy' or 'sell'
+        :param str version: the api version to use
+        :param bool sandbox: True if using the sandbox api, False by default
+        :param str client_order_id: (recommended) a unique order id defined by the user
+        :param str order_type: the order type; 'exchange stop limit' for stop-limit orders, 'exchange limit' otherwise
+        :param list options: (optional) a list containing at most one supported order execution option
+        :param str min_amount: (optional) minimum decimal amount to purchase, for block trades only
+        :param str stop_price: (optional) the price to trigger a stop-limit order; only available for stop-limit orders
+        :param str account: (optional) required for Master API keys; the name of the account in the sub-account group
+        :return: HTTP response
+        """
+        self.active_payload = NewOrderPayload(client_order_id=client_order_id,
+                                              symbol=symbol,
+                                              amount=amount,
+                                              price=price,
+                                              side=side,
+                                              version=version,
+                                              order_type=order_type,
+                                              min_amount=min_amount,
+                                              options=options,
+                                              stop_price=stop_price,
+                                              account=account).get_payload()
+        self.active_headers = BaseHeaders(api_key=self._api_key,
+                                          api_secret=self._api_secret,
+                                          payload=self.active_payload).get_headers()
+        self.active_endpoint = NewOrderEndpoint(version=version, sandbox=sandbox).get_endpoint()
+        response = requests.post(url=self.active_endpoint, headers=self.active_headers)
+        return response
 
     def cancel_order(self):
         pass

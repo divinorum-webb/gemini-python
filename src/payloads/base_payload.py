@@ -4,7 +4,7 @@ import time
 
 class BasePayload:
     def __init__(self):
-        self._payload_items = {"nonce": self.nonce}
+        self._payload = {"nonce": self.nonce}
 
     @property
     def nonce(self):
