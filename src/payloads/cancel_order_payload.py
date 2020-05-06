@@ -1,4 +1,3 @@
-import json
 from .base_payload import BasePayload
 
 

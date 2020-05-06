@@ -40,6 +40,4 @@ class BaseHeaders:
         }
 
     def get_headers(self):
-        print("signature: ", self.signature)
-        print("headers: ", self.headers)
         return self.headers
