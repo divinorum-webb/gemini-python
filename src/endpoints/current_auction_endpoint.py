@@ -2,7 +2,7 @@ from .base_endpoint import BaseEndpoint
 from src.decorators import verify_api_method_exists
 
 
-class CurrentAuction(BaseEndpoint):
+class CurrentAuctionEndpoint(BaseEndpoint):
     def __init__(self, symbol, version='v1', sandbox=False):
         """
         Initializes the CurrentAuction class.
