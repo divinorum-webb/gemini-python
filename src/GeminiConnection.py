@@ -1,9 +1,9 @@
 import requests
 
 from .headers import BaseHeaders
-from .payloads import NewOrderPayload
-from .endpoints import SymbolsEndpoint, TickerEndpoint, CandlesEndpoint, CurrentOrderBookEndpoint, \
-    TradeHistoryEndpoint, CurrentAuctionEndpoint, AuctionHistoryEndpoint, PriceFeedEndpoint, NewOrderEndpoint
+from .payloads import NewOrderPayload, CancelOrderPayload
+from .endpoints import TickerEndpoint, CandlesEndpoint, CurrentOrderBookEndpoint, TradeHistoryEndpoint, \
+    CurrentAuctionEndpoint, AuctionHistoryEndpoint, GenericEndpoint
 
 
 class GeminiConnection:
@@ -23,7 +23,7 @@ class GeminiConnection:
         :param bool sandbox: True if using the sandbox api, False by default
         :return: HTTP response
         """
-        self.active_endpoint = SymbolsEndpoint(version=version, sandbox=sandbox).get_endpoint()
+        self.active_endpoint = GenericEndpoint('symbols', version=version, sandbox=sandbox).get_endpoint()
         response = requests.get(self.active_endpoint)
         return response
 
@@ -149,7 +149,7 @@ class GeminiConnection:
         :param bool sandbox: True if using the sandbox api, False by default
         :return: HTTP response
         """
-        self.active_endpoint = PriceFeedEndpoint(version=version, sandbox=sandbox).get_endpoint()
+        self.active_endpoint = GenericEndpoint('pricefeed', version=version, sandbox=sandbox).get_endpoint()
         response = requests.get(self.active_endpoint)
         return response
 
@@ -195,15 +195,29 @@ class GeminiConnection:
                                               options=options,
                                               stop_price=stop_price,
                                               account=account).get_payload()
-        self.active_headers = BaseHeaders(api_key=self._api_key,
-                                          api_secret=self._api_secret,
-                                          payload=self.active_payload).get_headers()
-        self.active_endpoint = NewOrderEndpoint(version=version, sandbox=sandbox).get_endpoint()
+        self.active_headers = BaseHeaders(self._api_key, self._api_secret, self.active_payload).get_headers()
+        self.active_endpoint = GenericEndpoint('order/new', version=version, sandbox=sandbox).get_endpoint()
         response = requests.post(url=self.active_endpoint, headers=self.active_headers)
         return response
 
-    def cancel_order(self):
-        pass
+    def cancel_order(self,
+                     order_id,
+                     account=None,
+                     version='v1',
+                     sandbox=False) -> requests.models.Response:
+        """
+        Cancels the order whose 'order_id' is specified.
+        :param str order_id: the order's unique identifier
+        :param str account: (optional) required for Master API keys; the name of the account in the sub-account group
+        :param str version: the api version to use
+        :param bool sandbox: True if using the sandbox api, False by default
+        :return: HTTP response
+        """
+        self.active_payload = CancelOrderPayload(order_id=order_id, version=version, account=account).get_payload()
+        self.active_headers = BaseHeaders(self._api_key, self._api_secret, self.active_payload).get_headers()
+        self.active_endpoint = GenericEndpoint('order/cancel', version=version, sandbox=sandbox).get_endpoint()
+        response = requests.post(url=self.active_endpoint, headers=self.active_headers)
+        return response
 
     def cancel_all_session_orders(self):
         pass
