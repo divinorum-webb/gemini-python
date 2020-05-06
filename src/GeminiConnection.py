@@ -3,7 +3,7 @@ import requests
 from .headers import BaseHeaders
 from .payloads import BasePayload
 from .endpoints import SymbolsEndpoint, TickerEndpoint, CandlesEndpoint, CurrentOrderBookEndpoint, \
-    TradeHistoryEndpoint, CurrentAuction, AuctionHistoryEndpoint
+    TradeHistoryEndpoint, CurrentAuctionEndpoint, AuctionHistoryEndpoint, PriceFeedEndpoint
 
 
 class GeminiConnection:
@@ -112,7 +112,7 @@ class GeminiConnection:
         :param bool sandbox: True if using the sandbox api, False by default
         :return: HTTP response
         """
-        self.active_endpoint = CurrentAuction(symbol=symbol, version=version, sandbox=sandbox).get_endpoint()
+        self.active_endpoint = CurrentAuctionEndpoint(symbol=symbol, version=version, sandbox=sandbox).get_endpoint()
         response = requests.get(self.active_endpoint)
         return response
 
@@ -142,8 +142,16 @@ class GeminiConnection:
         response = requests.get(self.active_endpoint)
         return response
 
-    def get_price_feed(self):
-        pass
+    def get_price_feed(self, version='v1', sandbox='False') -> requests.models.Response:
+        """
+        Get price feed details, comparing prices for currency pairs.
+        :param str version: the api version to use
+        :param bool sandbox: True if using the sandbox api, False by default
+        :return: HTTP response
+        """
+        self.active_endpoint = PriceFeedEndpoint(version=version, sandbox=sandbox).get_endpoint()
+        response = requests.get(self.active_endpoint)
+        return response
 
     # define order placement api methods
 
