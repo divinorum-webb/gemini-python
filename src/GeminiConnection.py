@@ -3,7 +3,7 @@ import requests
 from .headers import BaseHeaders
 from .payloads import BasePayload
 from .endpoints import SymbolsEndpoint, TickerEndpoint, CandlesEndpoint, CurrentOrderBookEndpoint, \
-    TradeHistoryEndpoint, CurrentAuction
+    TradeHistoryEndpoint, CurrentAuction, AuctionHistoryEndpoint
 
 
 class GeminiConnection:
@@ -116,8 +116,31 @@ class GeminiConnection:
         response = requests.get(self.active_endpoint)
         return response
 
-    def get_auction_history(self):
-        pass
+    def get_auction_history(self,
+                            symbol,
+                            version='v1',
+                            sandbox=False,
+                            since=None,
+                            limit_auction_results=None,
+                            include_indicative=True) -> requests.models.Response:
+        """
+        Get historical auction events, optionally including publications of indicative prices, after the 'since' time.
+        :param str symbol: the crypto symbol being queried
+        :param str version: the api version to use
+        :param bool sandbox: True if using the sandbox api, False by default
+        :param since: (optional) if specified, only events occurring after this timestamp will be included
+        :param limit_auction_results: (optional) sets the maximum number of auction events to return; default is 50
+        :param include_indicative: (optional) True by default, includes publication of indicative prices and quantities
+        :return: HTTP response
+        """
+        self.active_endpoint = AuctionHistoryEndpoint(symbol=symbol,
+                                                      version=version,
+                                                      sandbox=sandbox,
+                                                      since=since,
+                                                      limit_auction_results=limit_auction_results,
+                                                      include_indicative=include_indicative).get_endpoint()
+        response = requests.get(self.active_endpoint)
+        return response
 
     def get_price_feed(self):
         pass
