@@ -30,8 +30,8 @@ class TradeHistoryEndpoint(BaseEndpoint):
             self._parameter_dict['timestamp'] = 'timestamp=' + str(self._timestamp)
         if self._limit_trades:
             self._parameter_dict['limit_trades'] = 'limit_trades=' + str(self._limit_trades)
-        if self._include_breaks:
-            self._parameter_dict['include_breaks'] = 'include_breaks=' + str(self._include_breaks)
+        if isinstance(self._include_breaks, bool):
+            self._parameter_dict['include_breaks'] = 'include_breaks=' + str(int(self._include_breaks))
         return self._parameter_dict
 
     @verify_api_method_exists('v1')
