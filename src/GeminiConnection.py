@@ -2,7 +2,8 @@ import requests
 
 from .headers import BaseHeaders
 from .payloads import BasePayload
-from .endpoints import SymbolsEndpoint, TickerEndpoint, CandlesEndpoint, CurrentOrderBookEndpoint
+from .endpoints import SymbolsEndpoint, TickerEndpoint, CandlesEndpoint, CurrentOrderBookEndpoint, \
+    TradeHistoryEndpoint
 
 
 class GeminiConnection:
@@ -77,8 +78,32 @@ class GeminiConnection:
         response = requests.get(self.active_endpoint)
         return response
 
-    def get_trade_history(self):
-        pass
+    def get_trade_history(self,
+                          symbol,
+                          version='v1',
+                          sandbox=False,
+                          timestamp=None,
+                          limit_trades=None,
+                          include_breaks=False) -> requests.models.Response:
+        """
+        Get the trades that have executed since the specified timestamp. Timestamps are in milliseconds.
+        :param str symbol: the crypto symbol being queried
+        :param str version: the api version to use
+        :param bool sandbox: True if using the sandbox api, False by default
+        :param int timestamp: (optional) only trades occurring after this timestamp will be returned
+        :param int limit_trades: (optional) sets the maximum number of trades to return; defaults to 50
+        :param bool include_breaks: (optional) True if displaying broken trades; False otherwise
+        :return: HTTP response
+        """
+        print("called get_trade_history")
+        self.active_endpoint = TradeHistoryEndpoint(symbol=symbol,
+                                                    version=version,
+                                                    sandbox=sandbox,
+                                                    timestamp=timestamp,
+                                                    limit_trades=limit_trades,
+                                                    include_breaks=include_breaks).get_endpoint()
+        response = requests.get(self.active_endpoint)
+        return response
 
     def get_current_action(self):
         pass
