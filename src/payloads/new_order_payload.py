@@ -41,8 +41,8 @@ class NewOrderPayload(BasePayload):
         self._options = options
         self._stop_price = stop_price
         self._account = account
-        self._add_required_payload_items()
-        self._add_optional_payload_items()
+        self._append_required_payload_params()
+        self._append_optional_payload_params()
 
     @property
     def request(self):
@@ -113,26 +113,31 @@ class NewOrderPayload(BasePayload):
     def payload(self):
         return self._payload
 
-    def _add_required_payload_items(self):
-        self._payload.update({'request': self.request})
-        self._payload.update({'nonce': self.nonce})
-        self._payload.update({'symbol': self.symbol})
-        self._payload.update({'amount': self.amount})
-        self._payload.update({'price': self.price})
-        self._payload.update({'side': self.side})
-        self._payload.update({'type': self.order_type})
+    @property
+    def required_payload_param_keys(self):
+        return ['request', 'nonce', 'symbol', 'amount', 'price', 'side', 'type']
 
-    def _add_optional_payload_items(self):
-        if self.client_order_id:
-            self._payload.update({'client_order_id': self.client_order_id})
-        if self.min_amount:
-            self._payload.update({'min_amount': self.min_amount})
-        if self.options:
-            self._payload.update({'options': self.options})
-        if self.stop_price:
-            self._payload.update({'stop_price': self.stop_price})
-        if self.account:
-            self._payload.update({'account': self.account})
+    @property
+    def required_payload_param_values(self):
+        return [self.request, self.nonce, self.symbol, self.amount, self.price, self.side, self.order_type]
+
+    @property
+    def optional_payload_param_keys(self):
+        return ['client_order_id', 'min_amount', 'options', 'stop_price', 'account']
+
+    @property
+    def optional_payload_param_values(self):
+        return [self.client_order_id, self.min_amount, self.options, self.stop_price, self.account]
+
+    def _append_required_payload_params(self):
+        if any(self.required_payload_param_values):
+            self._payload.update(self._get_parameters_dict(self.required_payload_param_keys,
+                                                           self.required_payload_param_values))
+
+    def _append_optional_payload_params(self):
+        if any(self.optional_payload_param_values):
+            self._payload.update(self._get_parameters_dict(self.optional_payload_param_keys,
+                                                           self.optional_payload_param_values))
 
     def get_payload(self):
         return self.payload

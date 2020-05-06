@@ -10,3 +10,11 @@ class BasePayload:
     def nonce(self):
         current_time = datetime.datetime.now()
         return str(int(time.mktime(current_time.timetuple()) * 1000))
+
+    @staticmethod
+    def _get_parameters_dict(param_keys, param_values):
+        params_dict = {}
+        for i, key in enumerate(param_keys):
+            if param_values[i] or param_values[i] is False:
+                params_dict.update({key: param_values[i]})
+        return params_dict
