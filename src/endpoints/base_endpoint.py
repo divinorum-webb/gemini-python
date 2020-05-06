@@ -23,6 +23,14 @@ class BaseEndpoint:
                 text_to_append += text if text_to_append.endswith('?') else ('&' + text)
         return "{0}{1}".format(url, text_to_append)
 
+    @staticmethod
+    def _get_parameter_dict(param_keys, param_values):
+        params_dict = {}
+        for i, key in enumerate(param_keys):
+            if param_values[i] or param_values[i] is False:
+                params_dict.update({key: param_values[i]})
+        return params_dict
+
     @property
     def version(self):
         return self._version

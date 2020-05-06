@@ -23,11 +23,17 @@ class CurrentOrderBookEndpoint(BaseEndpoint):
         return self._symbol
 
     @property
+    def url_param_keys(self):
+        return ['limit_bids', 'limit_asks']
+
+    @property
+    def url_param_values(self):
+        return [f"limit_bids={str(self._limit_bids)}" if self._limit_bids else None,
+                f"limit_asks={str(self._limit_asks)}" if self._limit_asks else None]
+
+    @property
     def parameter_dict(self):
-        if self._limit_bids:
-            self._parameter_dict['limit_bids'] = 'limit_bids=' + str(self._limit_bids)
-        if self._limit_asks:
-            self._parameter_dict['limit_asks'] = 'limit_asks=' + str(self._limit_asks)
+        self._parameter_dict.update(self._get_parameter_dict(self.url_param_keys, self.url_param_values))
         return self._parameter_dict
 
     @verify_api_method_exists('v1')

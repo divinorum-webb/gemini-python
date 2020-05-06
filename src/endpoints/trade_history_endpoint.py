@@ -17,7 +17,7 @@ class TradeHistoryEndpoint(BaseEndpoint):
         self._symbol = symbol
         self._timestamp = timestamp
         self._limit_trades = limit_trades
-        self._include_breaks = include_breaks
+        self._include_breaks = str(int(include_breaks)) if isinstance(include_breaks, bool) else "0"
         self._parameter_dict = self.parameter_dict
 
     @property
@@ -25,13 +25,18 @@ class TradeHistoryEndpoint(BaseEndpoint):
         return self._symbol
 
     @property
+    def url_param_keys(self):
+        return ['timestamp', 'limit_trades', 'include_breaks']
+
+    @property
+    def url_param_values(self):
+        return [f"timestamp={str(self._timestamp)}" if self._timestamp else None,
+                f"limit_trades={str(self._limit_trades)}" if self._limit_trades else None,
+                f"include_breaks={self._include_breaks}" if self._include_breaks else None]
+
+    @property
     def parameter_dict(self):
-        if self._timestamp:
-            self._parameter_dict['timestamp'] = 'timestamp=' + str(self._timestamp)
-        if self._limit_trades:
-            self._parameter_dict['limit_trades'] = 'limit_trades=' + str(self._limit_trades)
-        if isinstance(self._include_breaks, bool):
-            self._parameter_dict['include_breaks'] = 'include_breaks=' + str(int(self._include_breaks))
+        self._parameter_dict.update(self._get_parameter_dict(self.url_param_keys, self.url_param_values))
         return self._parameter_dict
 
     @verify_api_method_exists('v1')
