@@ -3,7 +3,7 @@ import requests
 from .headers import BaseHeaders
 from .payloads import BasePayload
 from .endpoints import SymbolsEndpoint, TickerEndpoint, CandlesEndpoint, CurrentOrderBookEndpoint, \
-    TradeHistoryEndpoint
+    TradeHistoryEndpoint, CurrentAuction
 
 
 class GeminiConnection:
@@ -95,7 +95,6 @@ class GeminiConnection:
         :param bool include_breaks: (optional) True if displaying broken trades; False otherwise
         :return: HTTP response
         """
-        print("called get_trade_history")
         self.active_endpoint = TradeHistoryEndpoint(symbol=symbol,
                                                     version=version,
                                                     sandbox=sandbox,
@@ -105,8 +104,17 @@ class GeminiConnection:
         response = requests.get(self.active_endpoint)
         return response
 
-    def get_current_action(self):
-        pass
+    def get_current_action(self, symbol, version='v1', sandbox=False) -> requests.models.Response:
+        """
+        Get current auction details.
+        :param str symbol: the crypto symbol being queried
+        :param str version: the api version to use
+        :param bool sandbox: True if using the sandbox api, False by default
+        :return: HTTP response
+        """
+        self.active_endpoint = CurrentAuction(symbol=symbol, version=version, sandbox=sandbox).get_endpoint()
+        response = requests.get(self.active_endpoint)
+        return response
 
     def get_auction_history(self):
         pass
