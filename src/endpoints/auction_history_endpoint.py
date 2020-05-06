@@ -15,15 +15,15 @@ class AuctionHistoryEndpoint(BaseEndpoint):
         :param str symbol: the crypto symbol being queried
         :param str version: the api version to use
         :param bool sandbox: True if using the sandbox api, False by default
-        :param since: (optional) if specified, only events occurring after this timestamp will be included
-        :param limit_auction_results: (optional) sets the maximum number of auction events to return; default is 50
-        :param include_indicative: (optional) True by default, includes publication of indicative prices and quantities
+        :param int since: (optional) if specified, only events occurring after this timestamp will be included
+        :param int limit_auction_results: (optional) sets the maximum number of auction events to return; default is 50
+        :param bool include_indicative: (optional) True by default, includes publication of indicative prices
         """
         super().__init__(version, sandbox)
         self._symbol = symbol
         self._since = since
         self._limit_auction_results = limit_auction_results
-        self._include_indicative = include_indicative
+        self._include_indicative = str(int(include_indicative)) if isinstance(include_indicative, bool) else "1"
         self._parameter_dict = self.parameter_dict
 
     @property
@@ -31,13 +31,18 @@ class AuctionHistoryEndpoint(BaseEndpoint):
         return self._symbol
 
     @property
+    def url_param_keys(self):
+        return ['since', 'limit_auction_results', 'include_indicative']
+
+    @property
+    def url_param_values(self):
+        return [f"since={str(self._since)}" if self._since else None,
+                f"limit_auction_results={str(self._limit_auction_results)}" if self._limit_auction_results else None,
+                f"include_indicative={str(self._include_indicative)}" if self._include_indicative else None]
+
+    @property
     def parameter_dict(self):
-        if self._since:
-            self._parameter_dict['since'] = 'since=' + str(self._since)
-        if self._limit_auction_results:
-            self._parameter_dict['limit_auction_results'] = 'limit_auction_results=' + str(self._limit_auction_results)
-        if isinstance(self._include_indicative, bool):
-            self._parameter_dict['include_indicative'] = 'include_indicative=' + str(int(self._include_indicative))
+        self._parameter_dict.update(self._get_parameter_dict(self.url_param_keys, self.url_param_values))
         return self._parameter_dict
 
     @verify_api_method_exists('v1')
