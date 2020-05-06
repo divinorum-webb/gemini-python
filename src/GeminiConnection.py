@@ -1,9 +1,9 @@
 import requests
 
 from .headers import BaseHeaders
-from .payloads import NewOrderPayload, CancelOrderPayload
-from .endpoints import TickerEndpoint, CandlesEndpoint, CurrentOrderBookEndpoint, TradeHistoryEndpoint, \
-    CurrentAuctionEndpoint, AuctionHistoryEndpoint, GenericEndpoint
+from .payloads import GenericPayload, NewOrderPayload, CancelOrderPayload
+from .endpoints import GenericEndpoint, TickerEndpoint, CandlesEndpoint, CurrentOrderBookEndpoint, \
+    TradeHistoryEndpoint, CurrentAuctionEndpoint, AuctionHistoryEndpoint
 
 
 class GeminiConnection:
@@ -219,11 +219,41 @@ class GeminiConnection:
         response = requests.post(url=self.active_endpoint, headers=self.active_headers)
         return response
 
-    def cancel_all_session_orders(self):
-        pass
+    def cancel_all_session_orders(self,
+                                  account=None,
+                                  version='v1',
+                                  sandbox=False
+                                  ) -> requests.models.Response:
+        """
+        Cancels all orders opened by this session.
+        :param str account: (optional) required for Master API keys; the name of the account in the sub-account group
+        :param str version: the api version to use
+        :param bool sandbox: True if using the sandbox api, False by default
+        :return: HTTP response
+        """
+        self.active_payload = GenericPayload('order/cancel/session', account=account).get_payload()
+        self.active_headers = BaseHeaders(self._api_key, self._api_secret, self.active_payload).get_headers()
+        self.active_endpoint = GenericEndpoint('order/cancel/session', version=version, sandbox=sandbox).get_endpoint()
+        response = requests.post(url=self.active_endpoint, headers=self.active_headers)
+        return response
 
-    def cancel_all_active_orders(self):
-        pass
+    def cancel_all_active_orders(self,
+                                 account=None,
+                                 version='v1',
+                                 sandbox=False
+                                 ) -> requests.models.Response:
+        """
+        Cancels all outstanding orders created by all sessions owned by this account.
+        :param str account: (optional) required for Master API keys; the name of the account in the sub-account group
+        :param str version: the api version to use
+        :param bool sandbox: True if using the sandbox api, False by default
+        :return: HTTP response
+        """
+        self.active_payload = GenericPayload('order/cancel/all', account=account).get_payload()
+        self.active_headers = BaseHeaders(self._api_key, self._api_secret, self.active_payload).get_headers()
+        self.active_endpoint = GenericEndpoint('order/cancel/all', version=version, sandbox=sandbox).get_endpoint()
+        response = requests.post(url=self.active_endpoint, headers=self.active_headers)
+        return response
 
     # define order status api methods
 
