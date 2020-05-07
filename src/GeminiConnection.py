@@ -1,7 +1,8 @@
 import requests
 
 from .headers import BaseHeaders
-from .payloads import GenericPayload, NewOrderPayload, OrderPayload, PastTradesPayload, NewDepositAddressPayload
+from .payloads import GenericPayload, NewOrderPayload, OrderPayload, PastTradesPayload, NewDepositAddressPayload, \
+    WithdrawCryptoFundsPayload
 from .endpoints import GenericEndpoint, TickerEndpoint, CandlesEndpoint, CurrentOrderBookEndpoint, \
     TradeHistoryEndpoint, CurrentAuctionEndpoint, AuctionHistoryEndpoint, PastTradesEndpoint, TransfersEndpoint, \
     DepositAddressesEndpoint, NewDepositAddressEndpoint
@@ -480,8 +481,28 @@ class GeminiConnection:
         response = requests.post(url=self.active_endpoint, headers=self.active_headers)
         return response
 
-    def withdraw_crypto_funds_to_whitelisted_address(self):
-        pass
+    def withdraw_crypto_funds_to_whitelisted_address(self,
+                                                     address,
+                                                     amount,
+                                                     currency,
+                                                     account=None,
+                                                     version='v1',
+                                                     sandbox=False) -> requests.models.Response:
+        """
+        Withdraws crypto funds to the specified whitelisted address.
+        :param str address: the whitelisted crypto currency address where funds will be sent
+        :param str amount: the amount of funds to withdraw
+        :param str currency: the crypto currency variety to withdraw
+        :param str account: (optional) required for Master API keys; the name of the account in the sub-account group
+        :param str version: the api version to use
+        :param bool sandbox: True if using the sandbox api, False by default
+        :return: HTTP response
+        """
+        self.active_payload = WithdrawCryptoFundsPayload(address, amount, currency, version, account).get_payload()
+        self.active_headers = BaseHeaders(self._api_key, self._api_secret, self.active_payload).get_headers()
+        self.active_endpoint = GenericEndpoint(f'withdraw/{currency}', version, sandbox).get_endpoint()
+        response = requests.post(url=self.active_endpoint, headers=self.active_headers)
+        return response
 
     def internal_transfers(self):
         pass

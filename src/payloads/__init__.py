@@ -4,3 +4,4 @@ from .order_payload import OrderPayload
 from .generic_payload import GenericPayload
 from .past_trades_payload import PastTradesPayload
 from .new_deposit_address_payload import NewDepositAddressPayload
+from .withdraw_crypto_funds_payload import WithdrawCryptoFundsPayload

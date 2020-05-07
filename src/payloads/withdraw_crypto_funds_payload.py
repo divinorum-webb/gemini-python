@@ -1,22 +1,25 @@
 from .base_payload import BasePayload
 
 
-class OrderPayload(BasePayload):
+class WithdrawCryptoFundsPayload(BasePayload):
     def __init__(self,
-                 endpoint_text,
-                 order_id,
+                 address,
+                 amount,
+                 currency,
                  version='v1',
                  account=None):
         """
-        Initializes the OrderPayload class.
-        :param str endpoint_text: the tail end of the endpoint url to append to the base url
-        :param str order_id: the order's unique identifier
+        Initializes the WithdrawCryptoFundsPayload class.
+        :param str address: the whitelisted crypto currency address where funds will be sent
+        :param str amount: the amount of funds to withdraw
+        :param str currency: the crypto currency variety to withdraw
         :param str version: the api version to use
         :param str account: (optional) required for Master API keys; the name of the account in the sub-account group
         """
         super().__init__()
-        self._endpoint_text = endpoint_text
-        self._order_id = order_id
+        self._address = address
+        self._amount = amount
+        self._currency = currency
         self._version = version
         self._account = account
         self._append_required_payload_params()
@@ -24,11 +27,19 @@ class OrderPayload(BasePayload):
 
     @property
     def request(self):
-        return "/{0}/{1}".format(self._version, self._endpoint_text)
-
+        return "/{0}/withdraw/{1}".format(self._version, self._currency)
+    
     @property
-    def order_id(self):
-        return self._order_id
+    def address(self):
+        return self._address
+    
+    @property
+    def amount(self):
+        return self._amount
+    
+    @property
+    def currency(self):
+        return self._currency
 
     @property
     def account(self):
@@ -40,11 +51,11 @@ class OrderPayload(BasePayload):
 
     @property
     def required_payload_param_keys(self):
-        return ['request', 'nonce', 'order_id']
+        return ['request', 'nonce', 'address', 'amount']
 
     @property
     def required_payload_param_values(self):
-        return [self.request, self.nonce, self.order_id]
+        return [self.request, self.nonce, self.address, self.amount]
 
     @property
     def optional_payload_param_keys(self):
