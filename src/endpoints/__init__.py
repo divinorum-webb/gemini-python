@@ -8,3 +8,4 @@ from .auction_history_endpoint import AuctionHistoryEndpoint
 from .generic_endpoint import GenericEndpoint
 from .past_trades_endpoint import PastTradesEndpoint
 from .transfers_endpoint import TransfersEndpoint
+from .deposit_addresses_endpoint import DepositAddressesEndpoint

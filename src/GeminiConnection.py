@@ -3,7 +3,8 @@ import requests
 from .headers import BaseHeaders
 from .payloads import GenericPayload, NewOrderPayload, OrderPayload, PastTradesPayload
 from .endpoints import GenericEndpoint, TickerEndpoint, CandlesEndpoint, CurrentOrderBookEndpoint, \
-    TradeHistoryEndpoint, CurrentAuctionEndpoint, AuctionHistoryEndpoint, PastTradesEndpoint, TransfersEndpoint
+    TradeHistoryEndpoint, CurrentAuctionEndpoint, AuctionHistoryEndpoint, PastTradesEndpoint, TransfersEndpoint, \
+    DepositAddressesEndpoint
 
 
 class GeminiConnection:
@@ -434,19 +435,21 @@ class GeminiConnection:
         return response
 
     def get_deposit_addresses(self,
+                              network,
                               account=None,
                               version='v1',
                               sandbox=False) -> requests.models.Response:
         """
-        Retrieves deposit addresses.
+        Retrieves deposit address details for the specified crypto network.
+        :param str network: the crypto currency network
         :param str account: (optional) required for Master API keys; the name of the account in the sub-account group
         :param str version: the api version to use
         :param bool sandbox: True if using the sandbox api, False by default
         :return: HTTP response
         """
-        self.active_payload = GenericPayload('notionalbalances/usd', account=account).get_payload()
+        self.active_payload = GenericPayload(f'addresses/{network}', version, account=account).get_payload()
         self.active_headers = BaseHeaders(self._api_key, self._api_secret, self.active_payload).get_headers()
-        self.active_endpoint = GenericEndpoint('notionalbalances/usd', version=version, sandbox=sandbox).get_endpoint()
+        self.active_endpoint = DepositAddressesEndpoint('addresses', network, version, sandbox=sandbox).get_endpoint()
         response = requests.post(url=self.active_endpoint, headers=self.active_headers)
         return response
 
