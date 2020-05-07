@@ -1,10 +1,10 @@
 import requests
 
 from .headers import BaseHeaders
-from .payloads import GenericPayload, NewOrderPayload, OrderPayload, PastTradesPayload
+from .payloads import GenericPayload, NewOrderPayload, OrderPayload, PastTradesPayload, NewDepositAddressPayload
 from .endpoints import GenericEndpoint, TickerEndpoint, CandlesEndpoint, CurrentOrderBookEndpoint, \
     TradeHistoryEndpoint, CurrentAuctionEndpoint, AuctionHistoryEndpoint, PastTradesEndpoint, TransfersEndpoint, \
-    DepositAddressesEndpoint
+    DepositAddressesEndpoint, NewDepositAddressEndpoint
 
 
 class GeminiConnection:
@@ -453,8 +453,32 @@ class GeminiConnection:
         response = requests.post(url=self.active_endpoint, headers=self.active_headers)
         return response
 
-    def new_deposit_addresses(self):
-        pass
+    def new_deposit_addresses(self,
+                              network,
+                              label=None,
+                              legacy=None,
+                              account=None,
+                              version='v1',
+                              sandbox=False) -> requests.models.Response:
+        """
+        Creates a new deposit address for the specified network.
+        :param str network: the crypto currency network
+        :param str label: (optional) a label for the deposit address
+        :param bool legacy: (optional) False by default; True if generating a legacy P2SH-P2PKH litecoin address
+        :param str account: (optional) required for Master API keys; the name of the account in the sub-account group
+        :param str version: the api version to use
+        :param bool sandbox: True if using the sandbox api, False by default
+        :return: HTTP response
+        """
+        self.active_payload = NewDepositAddressPayload(network=network,
+                                                       label=label,
+                                                       legacy=legacy,
+                                                       version=version,
+                                                       account=account).get_payload()
+        self.active_headers = BaseHeaders(self._api_key, self._api_secret, self.active_payload).get_headers()
+        self.active_endpoint = NewDepositAddressEndpoint('deposit', network, version, sandbox).get_endpoint()
+        response = requests.post(url=self.active_endpoint, headers=self.active_headers)
+        return response
 
     def withdraw_crypto_funds_to_whitelisted_address(self):
         pass

@@ -2,10 +2,10 @@ from .base_endpoint import BaseEndpoint
 from src.decorators import verify_api_method_exists
 
 
-class DepositAddressesEndpoint(BaseEndpoint):
+class NewDepositAddressEndpoint(BaseEndpoint):
     def __init__(self, endpoint_text, network, version='v1', sandbox=False):
         """
-        Initializes the DepositAddressesEndpoint class.
+        Initializes the GenericEndpoint class.
         :param str endpoint_text: the tail end of the endpoint url to append to the base url
         :param str network: the crypto currency network
         :param str version: the api version to use
@@ -37,4 +37,4 @@ class DepositAddressesEndpoint(BaseEndpoint):
             url = self.base_sandbox_url
         else:
             url = self.base_url
-        return "{0}/{1}/{2}/{3}".format(url, self.version, self._endpoint_text, self.network)
+        return "{0}/{1}/{2}/{3}/newAddress".format(url, self.version, self._endpoint_text, self.network)
