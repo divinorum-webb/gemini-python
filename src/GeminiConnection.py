@@ -1,9 +1,9 @@
 import requests
 
 from .headers import BaseHeaders
-from .payloads import GenericPayload, NewOrderPayload, CancelOrderPayload
+from .payloads import GenericPayload, NewOrderPayload, OrderPayload, PastTradesPayload
 from .endpoints import GenericEndpoint, TickerEndpoint, CandlesEndpoint, CurrentOrderBookEndpoint, \
-    TradeHistoryEndpoint, CurrentAuctionEndpoint, AuctionHistoryEndpoint
+    TradeHistoryEndpoint, CurrentAuctionEndpoint, AuctionHistoryEndpoint, PastTradesEndpoint
 
 
 class GeminiConnection:
@@ -213,7 +213,7 @@ class GeminiConnection:
         :param bool sandbox: True if using the sandbox api, False by default
         :return: HTTP response
         """
-        self.active_payload = CancelOrderPayload(order_id=order_id, version=version, account=account).get_payload()
+        self.active_payload = OrderPayload('order/cancel', order_id, version=version, account=account).get_payload()
         self.active_headers = BaseHeaders(self._api_key, self._api_secret, self.active_payload).get_headers()
         self.active_endpoint = GenericEndpoint('order/cancel', version=version, sandbox=sandbox).get_endpoint()
         response = requests.post(url=self.active_endpoint, headers=self.active_headers)
@@ -257,22 +257,94 @@ class GeminiConnection:
 
     # define order status api methods
 
-    def order_status(self):
-        pass
+    def order_status(self,
+                     order_id,
+                     account=None,
+                     version='v1',
+                     sandbox=False) -> requests.models.Response:
+        """
+        Retrieves status details for the order whose 'order_id' is specified.
+        :param str order_id: the order's unique identifier
+        :param str account: (optional) required for Master API keys; the name of the account in the sub-account group
+        :param str version: the api version to use
+        :param bool sandbox: True if using the sandbox api, False by default
+        :return: HTTP response
+        """
+        self.active_payload = OrderPayload('order/status', order_id, version=version, account=account).get_payload()
+        self.active_headers = BaseHeaders(self._api_key, self._api_secret, self.active_payload).get_headers()
+        self.active_endpoint = GenericEndpoint('order/status', version=version, sandbox=sandbox).get_endpoint()
+        response = requests.post(url=self.active_endpoint, headers=self.active_headers)
+        return response
 
-    def get_active_orders(self):
-        pass
+    def get_active_orders(self,
+                          account=None,
+                          version='v1',
+                          sandbox=False) -> requests.models.Response:
+        """
+        Retrieves details for all active orders.
+        :param str account: (optional) required for Master API keys; the name of the account in the sub-account group
+        :param str version: the api version to use
+        :param bool sandbox: True if using the sandbox api, False by default
+        :return: HTTP response
+        """
+        self.active_payload = GenericPayload('orders', account=account).get_payload()
+        self.active_headers = BaseHeaders(self._api_key, self._api_secret, self.active_payload).get_headers()
+        self.active_endpoint = GenericEndpoint('orders', version=version, sandbox=sandbox).get_endpoint()
+        response = requests.post(url=self.active_endpoint, headers=self.active_headers)
+        return response
 
-    def get_past_trades(self):
-        pass
+    def get_past_trades(self,
+                        symbol,
+                        timestamp=None,
+                        limit_trades=None,
+                        account=None,
+                        version='v1',
+                        sandbox=False) -> requests.models.Response:
+        self.active_payload = PastTradesPayload(symbol=symbol, version=version, account=account).get_payload()
+        self.active_headers = BaseHeaders(self._api_key, self._api_secret, self.active_payload).get_headers()
+        self.active_endpoint = PastTradesEndpoint(symbol=symbol,
+                                                  version=version,
+                                                  sandbox=sandbox,
+                                                  timestamp=timestamp,
+                                                  limit_trades=limit_trades).get_endpoint()
+        response = requests.post(url=self.active_endpoint, headers=self.active_headers)
+        return response
 
     # define fee and volume api methods
 
-    def get_notional_volume(self):
-        pass
+    def get_notional_volume(self,
+                            account=None,
+                            version='v1',
+                            sandbox=False) -> requests.models.Response:
+        """
+        Retrieves details for volume in price currency traded across all currency pairs over a period of 30 days.
+        :param str account: (optional) required for Master API keys; the name of the account in the sub-account group
+        :param str version: the api version to use
+        :param bool sandbox: True if using the sandbox api, False by default
+        :return: HTTP response
+        """
+        self.active_payload = GenericPayload('notionalvolume', account=account).get_payload()
+        self.active_headers = BaseHeaders(self._api_key, self._api_secret, self.active_payload).get_headers()
+        self.active_endpoint = GenericEndpoint('notionalvolume', version=version, sandbox=sandbox).get_endpoint()
+        response = requests.post(url=self.active_endpoint, headers=self.active_headers)
+        return response
 
-    def get_trade_volume(self):
-        pass
+    def get_trade_volume(self,
+                         account=None,
+                         version='v1',
+                         sandbox=False) -> requests.models.Response:
+        """
+        Retrieves an array of up to 30 days of trade volume for each crypto currency symbol.
+        :param str account: (optional) required for Master API keys; the name of the account in the sub-account group
+        :param str version: the api version to use
+        :param bool sandbox: True if using the sandbox api, False by default
+        :return: HTTP response
+        """
+        self.active_payload = GenericPayload('tradevolume', account=account).get_payload()
+        self.active_headers = BaseHeaders(self._api_key, self._api_secret, self.active_payload).get_headers()
+        self.active_endpoint = GenericEndpoint('tradevolume', version=version, sandbox=sandbox).get_endpoint()
+        response = requests.post(url=self.active_endpoint, headers=self.active_headers)
+        return response
 
     # define gemini clearing api methods
 

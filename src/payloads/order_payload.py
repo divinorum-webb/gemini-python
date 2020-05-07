@@ -1,18 +1,21 @@
 from .base_payload import BasePayload
 
 
-class CancelOrderPayload(BasePayload):
+class OrderPayload(BasePayload):
     def __init__(self,
+                 endpoint_text,
                  order_id,
                  version='v1',
                  account=None):
         """
         Initializes the CancelOrderPayload class.
+        :param str endpoint_text: the tail end of the endpoint url to append to the base url
         :param str order_id: the order's unique identifier
         :param str version: the api version to use
         :param str account: (optional) required for Master API keys; the name of the account in the sub-account group
         """
         super().__init__()
+        self._endpoint_text = endpoint_text
         self._order_id = order_id
         self._version = version
         self._account = account
@@ -21,7 +24,7 @@ class CancelOrderPayload(BasePayload):
 
     @property
     def request(self):
-        return "/{0}/order/cancel".format(self._version)
+        return "/{0}/{1}".format(self._version, self._endpoint_text)
 
     @property
     def order_id(self):
