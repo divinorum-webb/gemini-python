@@ -3,7 +3,7 @@ import requests
 from .headers import BaseHeaders
 from .payloads import GenericPayload, NewOrderPayload, OrderPayload, PastTradesPayload
 from .endpoints import GenericEndpoint, TickerEndpoint, CandlesEndpoint, CurrentOrderBookEndpoint, \
-    TradeHistoryEndpoint, CurrentAuctionEndpoint, AuctionHistoryEndpoint, PastTradesEndpoint
+    TradeHistoryEndpoint, CurrentAuctionEndpoint, AuctionHistoryEndpoint, PastTradesEndpoint, TransfersEndpoint
 
 
 class GeminiConnection:
@@ -300,6 +300,16 @@ class GeminiConnection:
                         account=None,
                         version='v1',
                         sandbox=False) -> requests.models.Response:
+        """
+        Get details for past trades.
+        :param str symbol: the crypto symbol being queried
+        :param timestamp: (optional) if specified, only events occurring after this timestamp will be included
+        :param limit_trades: (optional) sets the maximum number of past trades to return; default is 50
+        :param str account: (optional) required for Master API keys; the name of the account in the sub-account group
+        :param str version: the api version to use
+        :param bool sandbox: True if using the sandbox api, False by default
+        :return: HTTP response
+        """
         self.active_payload = PastTradesPayload(symbol=symbol, version=version, account=account).get_payload()
         self.active_headers = BaseHeaders(self._api_key, self._api_secret, self.active_payload).get_headers()
         self.active_endpoint = PastTradesEndpoint(symbol=symbol,
@@ -399,11 +409,46 @@ class GeminiConnection:
         response = requests.post(url=self.active_endpoint, headers=self.active_headers)
         return response
 
-    def transfers(self):
-        pass
+    def transfers(self,
+                  timestamp=None,
+                  limit_transfers=None,
+                  account=None,
+                  version='v1',
+                  sandbox=False) -> requests.models.Response:
+        """
+        Get details for past transfers.
+        :param timestamp: (optional) if specified, only events occurring after this timestamp will be included
+        :param limit_transfers: (optional) sets the maximum number of past trades to return; default is 50
+        :param str account: (optional) required for Master API keys; the name of the account in the sub-account group
+        :param str version: the api version to use
+        :param bool sandbox: True if using the sandbox api, False by default
+        :return: HTTP response
+        """
+        self.active_payload = GenericPayload('transfers', version=version, account=account).get_payload()
+        self.active_headers = BaseHeaders(self._api_key, self._api_secret, self.active_payload).get_headers()
+        self.active_endpoint = TransfersEndpoint(version=version,
+                                                 sandbox=sandbox,
+                                                 timestamp=timestamp,
+                                                 limit_transfers=limit_transfers).get_endpoint()
+        response = requests.post(url=self.active_endpoint, headers=self.active_headers)
+        return response
 
-    def get_deposit_addresses(self):
-        pass
+    def get_deposit_addresses(self,
+                              account=None,
+                              version='v1',
+                              sandbox=False) -> requests.models.Response:
+        """
+        Retrieves deposit addresses.
+        :param str account: (optional) required for Master API keys; the name of the account in the sub-account group
+        :param str version: the api version to use
+        :param bool sandbox: True if using the sandbox api, False by default
+        :return: HTTP response
+        """
+        self.active_payload = GenericPayload('notionalbalances/usd', account=account).get_payload()
+        self.active_headers = BaseHeaders(self._api_key, self._api_secret, self.active_payload).get_headers()
+        self.active_endpoint = GenericEndpoint('notionalbalances/usd', version=version, sandbox=sandbox).get_endpoint()
+        response = requests.post(url=self.active_endpoint, headers=self.active_headers)
+        return response
 
     def new_deposit_addresses(self):
         pass

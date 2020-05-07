@@ -7,3 +7,4 @@ from .current_auction_endpoint import CurrentAuctionEndpoint
 from .auction_history_endpoint import AuctionHistoryEndpoint
 from .generic_endpoint import GenericEndpoint
 from .past_trades_endpoint import PastTradesEndpoint
+from .transfers_endpoint import TransfersEndpoint
