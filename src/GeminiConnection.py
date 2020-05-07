@@ -365,11 +365,39 @@ class GeminiConnection:
 
     # define fund management api methods
 
-    def get_available_balances(self):
-        pass
+    def get_available_balances(self,
+                               account=None,
+                               version='v1',
+                               sandbox=False) -> requests.models.Response:
+        """
+        Retrieves available account balances.
+        :param str account: (optional) required for Master API keys; the name of the account in the sub-account group
+        :param str version: the api version to use
+        :param bool sandbox: True if using the sandbox api, False by default
+        :return: HTTP response
+        """
+        self.active_payload = GenericPayload('balances', account=account).get_payload()
+        self.active_headers = BaseHeaders(self._api_key, self._api_secret, self.active_payload).get_headers()
+        self.active_endpoint = GenericEndpoint('balances', version=version, sandbox=sandbox).get_endpoint()
+        response = requests.post(url=self.active_endpoint, headers=self.active_headers)
+        return response
 
-    def get_notional_balances(self):
-        pass
+    def get_notional_balances(self,
+                              account=None,
+                              version='v1',
+                              sandbox=False) -> requests.models.Response:
+        """
+        Retrieves notional account balances.
+        :param str account: (optional) required for Master API keys; the name of the account in the sub-account group
+        :param str version: the api version to use
+        :param bool sandbox: True if using the sandbox api, False by default
+        :return: HTTP response
+        """
+        self.active_payload = GenericPayload('notionalbalances/usd', account=account).get_payload()
+        self.active_headers = BaseHeaders(self._api_key, self._api_secret, self.active_payload).get_headers()
+        self.active_endpoint = GenericEndpoint('notionalbalances/usd', version=version, sandbox=sandbox).get_endpoint()
+        response = requests.post(url=self.active_endpoint, headers=self.active_headers)
+        return response
 
     def transfers(self):
         pass
