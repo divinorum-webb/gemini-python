@@ -1,4 +1,3 @@
-import datetime
 import time
 
 
@@ -8,8 +7,8 @@ class BasePayload:
 
     @property
     def nonce(self):
-        current_time = datetime.datetime.now()
-        return str(int(time.mktime(current_time.timetuple()) * 1000))
+        current_time = time.time()
+        return str(int(current_time * 1000000))
 
     @staticmethod
     def _get_parameters_dict(param_keys, param_values):
