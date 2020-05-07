@@ -5,7 +5,7 @@ from src.decorators import verify_api_method_exists
 class PastTradesEndpoint(BaseEndpoint):
     def __init__(self, symbol, version='v1', sandbox=False, timestamp=None, limit_trades=None):
         """
-        Initializes the CurrentOrderBookEndpoint class.
+        Initializes the PastTradesEndpoint class.
         :param str symbol: the crypto symbol being queried
         :param str version: the api version to use
         :param bool sandbox: True if using the sandbox api, False by default
