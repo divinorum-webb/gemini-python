@@ -551,8 +551,18 @@ class GeminiConnection:
         response = requests.post(url=self.active_endpoint, headers=self.active_headers)
         return response
 
-    def get_accounts_in_master_group(self):
-        pass
+    def get_accounts_in_master_group(self, version='v1', sandbox=False) -> requests.models.Response:
+        """
+        Retrieves a list of all accounts within the group.
+        :param str version: the api version to use
+        :param bool sandbox: True if using the sandbox api, False by default
+        :return: HTTP response
+        """
+        self.active_payload = GenericPayload('account/list', version=version).get_payload()
+        self.active_headers = BaseHeaders(self._api_key, self._api_secret, self.active_payload).get_headers()
+        self.active_endpoint = GenericEndpoint('account/list', version, sandbox).get_endpoint()
+        response = requests.post(url=self.active_endpoint, headers=self.active_headers)
+        return response
 
     # define gemini dollar api methods
 
