@@ -2,7 +2,7 @@ import requests
 
 from .headers import BaseHeaders
 from .payloads import GenericPayload, NewOrderPayload, OrderPayload, PastTradesPayload, NewDepositAddressPayload, \
-    WithdrawCryptoFundsPayload, InternalTransfersPayload
+    WithdrawCryptoFundsPayload, InternalTransfersPayload, CreateAccountPayload
 from .endpoints import GenericEndpoint, TickerEndpoint, CandlesEndpoint, CurrentOrderBookEndpoint, \
     TradeHistoryEndpoint, CurrentAuctionEndpoint, AuctionHistoryEndpoint, PastTradesEndpoint, TransfersEndpoint, \
     DepositAddressesEndpoint, NewDepositAddressEndpoint
@@ -536,8 +536,20 @@ class GeminiConnection:
 
     # define account administration api methods
 
-    def create_account(self):
-        pass
+    def create_account(self, name, account_type, version='v1', sandbox=False) -> requests.models.Response:
+        """
+        Creates a new account that can perform account-level functions via REST API calls.
+        :param str name: the unique (account-wide) name for the new account
+        :param str account_type: (optional) dictates the account type created; either 'exchange' or 'custody'
+        :param str version: the api version to use
+        :param bool sandbox: True if using the sandbox api, False by default
+        :return: HTTP response
+        """
+        self.active_payload = CreateAccountPayload(name, account_type, version).get_payload()
+        self.active_headers = BaseHeaders(self._api_key, self._api_secret, self.active_payload).get_headers()
+        self.active_endpoint = GenericEndpoint('account/create', version, sandbox).get_endpoint()
+        response = requests.post(url=self.active_endpoint, headers=self.active_headers)
+        return response
 
     def get_accounts_in_master_group(self):
         pass
