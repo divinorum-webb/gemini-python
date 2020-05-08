@@ -566,10 +566,42 @@ class GeminiConnection:
 
     # define gemini dollar api methods
 
-    def withdraw_usd_as_gusd(self):
-        pass
+    def withdraw_usd_as_gusd(self,
+                             address,
+                             amount,
+                             account=None,
+                             version='v1',
+                             sandbox=False) -> requests.models.Response:
+        """
+        Withdraw USD currency as Gemini Dollar currency.
+        :param str address: the whitelisted GUSD address destination for the funds being withdrawn
+        :param str amount: the amount of funds to transfer
+        :param str account: (optional) required for Master API keys; the name of the account in the sub-account group
+        :param str version: the api version to use
+        :param bool sandbox: True if using the sandbox api, False by default
+        :return: HTTP response
+        """
+        self.active_payload = WithdrawCryptoFundsPayload(address=address,
+                                                         amount=amount,
+                                                         currency='usd',
+                                                         version=version,
+                                                         account=account).get_payload()
+        self.active_headers = BaseHeaders(self._api_key, self._api_secret, self.active_payload).get_headers()
+        self.active_endpoint = GenericEndpoint('withdraw/usd', version, sandbox).get_endpoint()
+        response = requests.post(url=self.active_endpoint, headers=self.active_headers)
+        return response
 
     # define session api methods
 
-    def heartbeat(self):
-        pass
+    def heartbeat(self, version='v1', sandbox=False) -> requests.models.Response:
+        """
+        Sends a heartbeat signal to keep the API session alive.
+        :param str version: the api version to use
+        :param bool sandbox: True if using the sandbox api, False by default
+        :return: HTTP response
+        """
+        self.active_payload = GenericPayload('heartbeat', version).get_payload()
+        self.active_headers = BaseHeaders(self._api_key, self._api_secret, self.active_payload).get_headers()
+        self.active_endpoint = GenericEndpoint('heartbeat', version, sandbox).get_endpoint()
+        response = requests.post(url=self.active_endpoint, headers=self.active_headers)
+        return response
