@@ -3,4 +3,5 @@
 config.py
 gemini_config.py
 **/test_env
+**/src/utils
 *__pycache__*
