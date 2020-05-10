@@ -14,14 +14,21 @@ class CandlesEndpoint(BaseEndpoint):
         super().__init__(version, sandbox)
         self._symbol = symbol
         self._time_frame = time_frame
-        self._validate_time_frame()
 
     @property
     def symbol(self):
+        self._validate_symbol()
         return self._symbol
 
     @property
+    def valid_symbols(self):
+        return ['btcusd', 'ethbtc', 'ethusd', 'zecusd', 'zecbtc', 'zeceth', 'zecbch', 'zecltc', 'bchusd', 'bchbtc',
+                'bcheth', 'ltcusd', 'ltcbtc', 'ltceth', 'ltcbch', 'batusd', 'daiusd', 'linkusd', 'oxtbtc', 'bateth',
+                'daieth', 'linketh', 'oxteth']
+
+    @property
     def time_frame(self):
+        self._validate_time_frame()
         return self._time_frame
 
     @property
@@ -35,6 +42,10 @@ class CandlesEndpoint(BaseEndpoint):
             '6hr',
             '1day'
         ]
+
+    def _validate_symbol(self):
+        if self._symbol not in self.valid_symbols:
+            raise ValueError(f"An invalid symbol was passed to {self.__class__.__name__}: '{self._symbol}'")
 
     def _validate_time_frame(self):
         if self._time_frame not in self.valid_time_frames:
