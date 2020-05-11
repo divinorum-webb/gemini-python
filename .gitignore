@@ -4,4 +4,5 @@ config.py
 gemini_config.py
 **/test_env
 **/src/utils
+**/src/trading
 *__pycache__*
